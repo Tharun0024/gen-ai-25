@@ -1,82 +1,48 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, ChangeEvent, DragEvent } from "react";
 import { motion } from "framer-motion";
-import { Upload, CheckCircle } from "lucide-react";
+import { Upload, CheckCircle, File as FileIcon, Loader2 } from "lucide-react";
+import { useDocumentAnalysis } from "./DocumentAnalysisContext";
 
-interface FileUploadProps {}
-
-interface ApiResponse {
-  extracted_text: string;
-  summary: string;
-  risks_and_score: string;
-  pros_cons: string;
+interface FileUploadProps {
+  onFileUpload: (file: File) => void;
 }
 
-const FileUpload: React.FC<FileUploadProps> = () => {
+const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload }) => {
   const [isDragOver, setIsDragOver] = useState(false);
-  const [uploadedFile, setUploadedFile] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [apiResult, setApiResult] = useState<ApiResponse | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const { isLoading, analysis } = useDocumentAnalysis();
 
-  const uploadFileToApi = async (file: File) => {
-    setLoading(true);
-    setError(null);
-    setApiResult(null);
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-const response = await fetch("http://127.0.0.1:8000/upload", {
-  method: "POST",
-  body: formData,
-});
-
-
-      if (!response.ok) {
-        throw new Error("Upload failed");
-      }
-
-      const data: ApiResponse = await response.json();
-      setApiResult(data);
-    } catch (err: any) {
-      setError(err.message || "An error occurred");
-    } finally {
-      setLoading(false);
-    }
+  const handleFile = (file: File) => {
+    setUploadedFile(file);
+    onFileUpload(file);
   };
 
   const handleDrop = useCallback(
-    (e: React.DragEvent) => {
+    (e: DragEvent<HTMLDivElement>) => {
       e.preventDefault();
       setIsDragOver(false);
-
       const files = e.dataTransfer.files;
       if (files.length > 0) {
-        const file = files[0];
-        setUploadedFile(file.name);
-        uploadFileToApi(file);
+        handleFile(files[0]);
       }
     },
     []
   );
 
-  const handleDragOver = useCallback((e: React.DragEvent) => {
+  const handleDragOver = useCallback((e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragOver(true);
   }, []);
 
-  const handleDragLeave = useCallback((e: React.DragEvent) => {
+  const handleDragLeave = useCallback((e: DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragOver(false);
   }, []);
 
-  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback((e: ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      const file = files[0];
-      setUploadedFile(file.name);
-      uploadFileToApi(file);
+      handleFile(files[0]);
     }
   }, []);
 
@@ -84,32 +50,29 @@ const response = await fetch("http://127.0.0.1:8000/upload", {
     <div>
       <h2 className="text-2xl font-bold text-gray-900 mb-4">Upload Document</h2>
 
-      {uploadedFile && !loading && apiResult ? (
+      {analysis && uploadedFile ? (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="bg-emerald-50 border-2 border-emerald-200 rounded-xl p-6 text-center"
         >
           <CheckCircle className="w-12 h-12 text-emerald-500 mx-auto mb-3" />
-          <p className="text-emerald-700 font-medium">
-            Document uploaded and processed successfully!
-          </p>
-          <p className="text-emerald-600 text-sm mt-1 mb-3">{uploadedFile}</p>
-
-          <div className="text-left max-w-xl mx-auto">
-            <h3 className="font-semibold mb-1">Summary:</h3>
-            <p className="mb-3 whitespace-pre-wrap">{apiResult.summary}</p>
-
-            <h3 className="font-semibold mb-1">Risks and Risk Score:</h3>
-            <p className="mb-3 whitespace-pre-wrap">{apiResult.risks_and_score}</p>
-
-            <h3 className="font-semibold mb-1">Pros and Cons:</h3>
-            <p className="mb-3 whitespace-pre-wrap">{apiResult.pros_cons}</p>
-          </div>
+          <p className="text-emerald-700 font-medium">Analysis Complete</p>
+          <p className="text-emerald-600 text-sm mt-1">{uploadedFile.name}</p>
         </motion.div>
-      ) : loading ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500">Processing document...</p>
+      ) : isLoading && uploadedFile ? (
+        <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center">
+          <div className="flex items-center justify-center">
+            <Loader2 className="w-6 h-6 text-indigo-500 animate-spin mr-3" />
+            <p className="text-gray-600">Analyzing {uploadedFile.name}...</p>
+          </div>
+        </div>
+      ) : uploadedFile ? (
+        <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center">
+          <div className="flex items-center justify-center">
+            <FileIcon className="w-6 h-6 text-gray-500 mr-3" />
+            <p className="text-gray-600">{uploadedFile.name}</p>
+          </div>
         </div>
       ) : (
         <motion.div
@@ -137,7 +100,6 @@ const response = await fetch("http://127.0.0.1:8000/upload", {
         </motion.div>
       )}
 
-      {error && <p className="text-red-600 mt-4 text-center">{error}</p>}
     </div>
   );
 };
