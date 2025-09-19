@@ -7,33 +7,9 @@ import { useDocumentAnalysis } from './DocumentAnalysisContext';
 const LeftPanel: React.FC = () => {
   const { analysis, isLoading } = useDocumentAnalysis();
 
-  const riskScore = useMemo(() => {
-    if (!analysis?.risks_and_score) return 0;
-    const match = analysis.risks_and_score.match(/Risk score:\s*(\d+(\.\d+)?)/i);
-    return match ? parseFloat(match[1]) : 0;
-  }, [analysis]);
-
-  const { pros, cons } = useMemo(() => {
-    if (!analysis?.pros_cons) return { pros: [], cons: [] };
-
-    const lines = analysis.pros_cons.split('\n');
-    const prosList: string[] = [];
-    const consList: string[] = [];
-    let currentList: 'PROS' | 'CONS' | null = null;
-
-    for (const line of lines) {
-      if (line.toUpperCase().includes('PROS:')) {
-        currentList = 'PROS';
-      } else if (line.toUpperCase().includes('CONS:')) {
-        currentList = 'CONS';
-      } else if (line.trim().startsWith('-') || line.trim().startsWith('*')) {
-        const text = line.trim().substring(1).trim();
-        if (currentList === 'PROS') prosList.push(text);
-        if (currentList === 'CONS') consList.push(text);
-      }
-    }
-    return { pros: prosList, cons: consList };
-  }, [analysis]);
+  const riskScore = analysis?.risk_score ?? 0;
+  const pros = analysis?.pros ?? [];
+  const cons = analysis?.cons ?? [];
 
   return (
     <div className="h-screen bg-white flex flex-col">

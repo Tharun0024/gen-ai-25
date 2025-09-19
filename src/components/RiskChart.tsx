@@ -2,11 +2,11 @@ import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 interface RiskChartProps {
-  score: number; // Score from 1 to 10
+  score: number; // Score from 1 to 100
 }
 
 const RiskChart: React.FC<RiskChartProps> = ({ score = 0 }) => {
-  const riskPercentage = Math.min(100, Math.max(0, Math.round((score / 10) * 100)));
+  const riskPercentage = Math.min(100, Math.max(0, Math.round(score)));
 
   const data = [
     { name: 'Risk', value: riskPercentage, color: '#EF4444' },
