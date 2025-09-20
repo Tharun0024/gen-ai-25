@@ -5,3 +5,7 @@ python-dotenv
 google-cloud-documentai
 google-cloud-vertexai
 google-cloud-aiplatform
+python-multipart 
+pytesseract 
+pillow
+python-docx
