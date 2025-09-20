@@ -3,8 +3,9 @@ import React, { createContext, useState, useContext, ReactNode } from 'react';
 export interface AnalysisData {
   extracted_text: string;
   summary: string;
-  risks_and_score: string;
-  pros_cons: string;
+  risk_score: number;
+  pros: string[];
+  cons: string[];
 }
 
 interface DocumentAnalysisContextType {

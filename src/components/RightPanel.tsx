@@ -50,7 +50,7 @@ const RightPanel: React.FC = () => {
       formData.append('user_question', text);
       formData.append('doc_text', analysis.extracted_text);
 
-      const response = await fetch('http://localhost:5000/ask', {
+      const response = await fetch('http://localhost:8000/ask', {
         method: 'POST',
         body: formData,
       });
@@ -92,7 +92,7 @@ const RightPanel: React.FC = () => {
     formData.append('file', file);
 
     try {
-      const response = await fetch('http://localhost:5000/upload', {
+      const response = await fetch('http://localhost:8000/upload', {
         method: 'POST',
         body: formData,
       });
