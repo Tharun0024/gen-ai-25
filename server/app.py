@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 import vertexai
 from google.cloud import documentai_v1 as documentai
+from privacy_layer import privacy_layer  # Import the privacy function from privacy.py
 # Import generative model classes lazily inside handlers to avoid init-time issues
 
 load_dotenv()
@@ -45,14 +46,14 @@ def ensure_clients():
 
     This avoids raising during module import when ADC or project ID
     are not configured. Returns a tuple (ok, message). If ok is False,
-    `message` contains a user-facing error description.
+    message contains a user-facing error description.
     """
     if _clients["vertex_initialized"] and _clients["docai_client"]:
         return True, ""
 
     # Basic validation
     if not project_id or not vertex_region:
-        return False, "Missing GCP project or Vertex region. Set `project_id` and `vertex_region` in your environment."
+        return False, "Missing GCP project or Vertex region. Set project_id and vertex_region in your environment."
 
     try:
         # Initialize Vertex AI
@@ -111,6 +112,8 @@ async def upload_document(file: UploadFile = File(...)):
             doc_text = file_bytes.decode("utf-8", errors="replace")
         except Exception:
             doc_text = ""
+    privacy_text = privacy_layer(doc_text)
+    doc_text = privacy_text['masked_text']    
 
     # Generate Summary, Risks, Pros, and Cons in a single call using Vertex AI
     try:
