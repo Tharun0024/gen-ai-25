@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+python-dotenv
+torch
+torchvision
+torchaudio
+transformers
+huggingface_hub
+sentencepiece
