@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+python-dotenv
+google-cloud-documentai
+vertexai
+torch
+torchvision
+torchaudio
+transformers
+huggingface_hub
+sentencepiece
+aiofiles
+gunicorn
