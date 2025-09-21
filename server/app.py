@@ -11,10 +11,16 @@ from privacy_layer import privacy_layer  # Import the privacy function from priv
 
 load_dotenv()
 
-# Set GOOGLE_APPLICATION_CREDENTIALS from .env (if present)
-cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-if cred_path:
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = cred_path
+import tempfile
+
+google_creds_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+if google_creds_json:
+    temp_dir = tempfile.gettempdir()
+    creds_path = os.path.join(temp_dir, "gg.json")
+
+    with open(creds_path, "w") as f:
+        f.write(google_creds_json)
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = creds_path
 
 app = FastAPI()
 
@@ -181,6 +187,9 @@ async def ask_question(
         return JSONResponse({"answer": answer})
     except Exception as e:
         return JSONResponse({"error": f"Model generation failed: {e}"}, status_code=500)
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 8000))  # Get Render's PORT or use 8000 locally
+    uvicorn.run("app:app", host="0.0.0.0", port=port)
 
 # Run with:
 # uvicorn app:app --reload --host 0.0.0.0 --port 8000
