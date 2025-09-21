@@ -11,10 +11,16 @@ from privacy_layer import privacy_layer  # Import the privacy function from priv
 
 load_dotenv()
 
-# Set GOOGLE_APPLICATION_CREDENTIALS from .env (if present)
-cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-if cred_path:
-    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = cred_path
+import tempfile
+
+google_creds_json = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+if google_creds_json:
+    temp_dir = tempfile.gettempdir()
+    creds_path = os.path.join(temp_dir, "gg.json")
+
+    with open(creds_path, "w") as f:
+        f.write(google_creds_json)
+    os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = creds_path
 
 app = FastAPI()
 
