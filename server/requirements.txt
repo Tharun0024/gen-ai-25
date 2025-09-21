@@ -1,6 +1,12 @@
 fastapi
 uvicorn
-jinja2
 python-dotenv
 google-cloud-documentai
-google-cloud-vertexai
+vertexai
+torch
+torchvision
+torchaudio
+transformers
+huggingface_hub
+sentencepiece
+aiofiles
