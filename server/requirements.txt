@@ -1,13 +1,22 @@
 fastapi
 uvicorn
-jinja2
 python-dotenv
+
+# Google Cloud APIs
 google-cloud-documentai
-google-cloud-vertexai
+vertexai
 google-cloud-aiplatform
+
+# Hugging Face & PyTorch for privacy layer
 torch
 torchvision
 torchaudio
 transformers
 huggingface_hub
 sentencepiece
+
+# CORS Middleware
+aiofiles
+
+# Optional: upgrade pip if you get issues
+# pip>=23.0
